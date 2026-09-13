@@ -1,0 +1,13 @@
+# Materials for screwdriver_complete.obj
+
+newmtl screwdriver_red
+Ka 0.120000 0.015000 0.015000
+Kd 0.850000 0.150000 0.150000
+Ks 0.250000 0.250000 0.250000
+Ns 32.000000
+
+newmtl screwdriver_metal
+Ka 0.120000 0.120000 0.130000
+Kd 0.650000 0.650000 0.700000
+Ks 0.800000 0.800000 0.850000
+Ns 96.000000

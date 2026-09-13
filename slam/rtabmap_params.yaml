@@ -1,0 +1,114 @@
+# rtabmap_ros 3D 激光 SLAM 参数（纯 lidar，无相机）。
+#
+# 配合 slam_bridge_3d.py 发布的 /pointcloud (PointCloud2) + /odom + TF 使用。
+# 注册策略使用 ICP（Reg/Strategy=1），不依赖视觉特征。
+rtabmap:
+  ros__parameters:
+    # --- 坐标系 ---
+    frame_id: base_footprint
+    # Leave odom_frame_id unset so rtabmap synchronizes the remapped /odom
+    # message with /pointcloud.  Setting it to "odom" switches to TF-only
+    # odometry and silently bypasses the /odom subscription in Foxy.
+    map_frame_id: map
+    odom_tf_linear_variance: 0.01
+    odom_tf_angular_variance: 0.01
+
+    # --- 订阅配置：纯 3D 点云输入 ---
+    subscribe_depth: false
+    subscribe_rgb: false
+    subscribe_scan: false
+    subscribe_scan_cloud: true
+    subscribe_stereo: false
+
+    # --- 同步 ---
+    approx_sync: true
+    approx_sync_max_interval: 0.5
+    wait_for_transform: 0.5
+
+    # --- 注册策略：ICP（lidar-only）---
+    Reg/Strategy: "1"
+    Reg/Force3DoF: "true"
+
+    # --- RGBD/图优化 ---
+    RGBD/ProximityBySpace: "true"
+    # 0=遍历整张图，节点变多后 proximity 检测和地图重发布都会明显变慢。
+    RGBD/ProximityMaxGraphDepth: "50"
+    RGBD/ProximityPathMaxNeighbors: "1"
+    RGBD/ProximityPathRawPosesUsed: "false"
+    RGBD/ProximityOdomGuess: "true"
+    RGBD/AngularUpdate: "0.05"
+    RGBD/LinearUpdate: "0.05"
+    RGBD/CreateOccupancyGrid: "true"
+    RGBD/NeighborLinkRefining: "false"
+    # 固定最老节点以保持 map 参考系稳定。当前不启用 WM/LTM 节点转移，
+    # 因此不会触发 RTAB-Map 对此模式所提示的局部图参考切换。
+    RGBD/OptimizeFromGraphEnd: "false"
+    RGBD/LoopCovLimited: "true"
+
+    # --- ICP 参数 ---
+    Icp/VoxelSize: "0.1"
+    Icp/PointToPlane: "true"
+    Icp/PointToPlaneK: "20"
+    # 低对应比例和大修正上限会把错误的远距离匹配也当成回环接受。
+    Icp/CorrespondenceRatio: "0.10"
+    Icp/OutlierRatio: "0.70"
+    Icp/Epsilon: "0.001"
+    Icp/MaxTranslation: "0.30"
+    Icp/MaxRotation: "0.20"
+    Icp/MaxCorrespondenceDistance: "0.30"
+    Icp/Iterations: "30"
+
+    # --- 内存管理 ---
+    Mem/NotLinkedNodesKept: "false"
+    Mem/STMSize: "20"
+    Mem/LaserScanNormalK: "20"
+    Mem/LaserScanVoxelSize: "0.10"
+
+    # --- 栅格/3D 地图 ---
+    Grid/Sensor: "0"                  # 用 scan_cloud（激光），不用深度相机
+    Grid/CellSize: "0.05"
+    Grid/RangeMax: "8.0"              # 与雷达 RANGE_MAX 一致，别声称看得更远
+    Grid/RangeMin: "0.0"
+    # 地面/障碍分层：雷达装在 0.95m，点云已含地板点。
+    # 低于 MaxGroundHeight 的算地面（用来标记空闲栅格 = RViz 里的白色区域），
+    # 高于它的算障碍。0.12 能容纳测距噪声又不会把矮箱子(0.22m)误判成地面。
+    Grid/MaxGroundHeight: "0.12"
+    Grid/MinGroundHeight: "-0.20"
+    Grid/MaxObstacleHeight: "2.0"
+    Grid/NormalsSegmentation: "false"  # 用高度阈值分割，比法向量稳
+    Grid/GroundIsObstacle: "false"
+    Grid/ClusterRadius: "1.0"
+    Grid/3D: "true"
+    Grid/RayTracing: "true"           # 从传感器到命中点之间标记为空闲
+    # 关键：关掉半径噪声滤波。
+    # 雷达角分辨率 1°，在 r 米处相邻点间距 = r*1.75e-2。半径 0.1m 内要凑够
+    # 2 个邻居，需要间距 < 0.1m，即 r < 5.7m；旧配置(2° 分辨率)临界值只有
+    # 2.87m，于是超过 2.87m 的点全被当成噪声删掉——这正是"只有近处一圈
+    # 障碍物进了 mapcloud，远处什么都没有"的直接原因。
+    Grid/NoiseFilteringRadius: "0.0"
+    Grid/NoiseFilteringMinNeighbors: "0"
+
+    # --- 3D 点云地图发布 ---
+    # 累积所有节点的点云为全局地图
+    cloud_output_voxelized: true
+    cloud_voxel_size: 0.10
+    # cloud_decimation 是对**有序**点云按行列抽samples；我们的点云是无序的
+    # (height=1)，抽稀会不可控地丢点，设 1 = 不抽稀。
+    cloud_decimation: 1
+    cloud_max_depth: 8.0
+    cloud_min_depth: 0.0
+    # 同样关掉发布端的噪声滤波，理由同 Grid/NoiseFiltering*
+    cloud_noise_filtering_radius: 0.0
+    cloud_noise_filtering_min_neighbors: 0
+    # 地板可视化裁剪由 cloud_map_height_filter.py 在 /cloud_map 的下游完成。
+    # 原始 /cloud_map 和 occupancy grid 保持完整，避免影响建图与避障。
+    # 地图组装：跳过平移小于 0.1m 且旋转小于 20deg 的近重复节点，保留
+    # 原地大角度扫描，同时避免节点增加后每次重组全部近重复点云。
+    map_filter_radius: 0.10
+    map_filter_angle: 20.0
+    map_negative_poses_ignored: false
+    # 让地图更实时
+    map_always_update: true
+    map_empty_ray_tracing: true
+    publish_last_signature: true
+    publish_stats: true

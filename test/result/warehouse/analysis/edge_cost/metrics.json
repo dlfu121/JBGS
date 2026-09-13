@@ -1,0 +1,162 @@
+{
+  "map": "/home/ee304/jbgs/mujoco-3.10.0/model.test/worker_scene/maps/warehouse/warehouse_map_3d.pgm",
+  "resolution": 0.05,
+  "origin": [
+    -3.33,
+    -3.33,
+    0.0
+  ],
+  "start_world": [
+    18.0,
+    1.0
+  ],
+  "goal_world": [
+    10.0,
+    10.0
+  ],
+  "start_grid": [
+    426,
+    86
+  ],
+  "goal_grid": [
+    266,
+    266
+  ],
+  "hard_clearance_m": 0.5,
+  "preferred_clearance_m": 0.85,
+  "cases": [
+    {
+      "planning_time_ms": 1855.2646689995527,
+      "expanded_nodes": 9072,
+      "los_checks": 9071,
+      "los_cells_checked": 403477,
+      "waypoint_count": 5,
+      "path_length_m": 14.182535268793945,
+      "minimum_clearance_m": 0.5590169943749475,
+      "mean_clearance_m": 1.2467438827398267,
+      "success": true,
+      "case": "A_baseline_reference",
+      "lambda_geo": 0.0,
+      "start": [
+        426,
+        86
+      ],
+      "goal": [
+        266,
+        266
+      ]
+    },
+    {
+      "planning_time_ms": 1856.9839199999478,
+      "expanded_nodes": 9072,
+      "los_checks": 9071,
+      "los_cells_checked": 403477,
+      "waypoint_count": 5,
+      "path_length_m": 14.182535268793945,
+      "minimum_clearance_m": 0.5590169943749475,
+      "mean_clearance_m": 1.2467438827398267,
+      "success": true,
+      "case": "B_unified_distance",
+      "lambda_geo": 0.0,
+      "start": [
+        426,
+        86
+      ],
+      "goal": [
+        266,
+        266
+      ]
+    },
+    {
+      "planning_time_ms": 3202.4232619996837,
+      "expanded_nodes": 10448,
+      "los_checks": 10447,
+      "los_cells_checked": 393175,
+      "waypoint_count": 11,
+      "path_length_m": 14.556757127794405,
+      "minimum_clearance_m": 0.8500000000000001,
+      "mean_clearance_m": 1.11449417578121,
+      "success": true,
+      "case": "C_safety_aware",
+      "lambda_geo": 2.0,
+      "start": [
+        426,
+        86
+      ],
+      "goal": [
+        266,
+        266
+      ]
+    }
+  ],
+  "height_cases": [
+    {
+      "planning_time_ms": 2279.7387139999046,
+      "expanded_nodes": 9072,
+      "los_checks": 9071,
+      "los_cells_checked": 403477,
+      "waypoint_count": 5,
+      "path_length_m": 14.182535268793945,
+      "minimum_clearance_m": 0.5590169943749475,
+      "mean_clearance_m": 1.2467438827398267,
+      "success": true,
+      "case": "height_lambda_0",
+      "lambda_height": 0.0,
+      "start": [
+        426,
+        86
+      ],
+      "goal": [
+        266,
+        266
+      ],
+      "minimum_height_clearance_m": Infinity
+    },
+    {
+      "planning_time_ms": 2266.942801999903,
+      "expanded_nodes": 9072,
+      "los_checks": 9071,
+      "los_cells_checked": 403477,
+      "waypoint_count": 5,
+      "path_length_m": 14.182535268793945,
+      "minimum_clearance_m": 0.5590169943749475,
+      "mean_clearance_m": 1.2467438827398267,
+      "success": true,
+      "case": "height_lambda_1",
+      "lambda_height": 1.0,
+      "start": [
+        426,
+        86
+      ],
+      "goal": [
+        266,
+        266
+      ],
+      "minimum_height_clearance_m": Infinity
+    },
+    {
+      "planning_time_ms": 2273.6759059998803,
+      "expanded_nodes": 9072,
+      "los_checks": 9071,
+      "los_cells_checked": 403477,
+      "waypoint_count": 5,
+      "path_length_m": 14.182535268793945,
+      "minimum_clearance_m": 0.5590169943749475,
+      "mean_clearance_m": 1.2467438827398267,
+      "success": true,
+      "case": "height_lambda_2",
+      "lambda_height": 2.0,
+      "start": [
+        426,
+        86
+      ],
+      "goal": [
+        266,
+        266
+      ],
+      "minimum_height_clearance_m": Infinity
+    }
+  ],
+  "hard_height_m": 0.7,
+  "preferred_height_m": 1.0
+}

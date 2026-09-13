@@ -1,0 +1,56 @@
+# Copy this template, then change scene_path to the target MJCF/XML.
+type: mujoco
+id: rm65_dexhand
+scene_path: /path/to/target_scene.xml
+ee_site_name: link_6
+
+arm_joint_names:
+  - joint_1
+  - joint_2
+  - joint_3
+  - joint_4
+  - joint_5
+  - joint_6
+
+# Keep this order if using the existing 26-D ACT checkpoint.
+gripper_joint_names:
+  - r_f_joint1_1
+  - r_f_joint1_2
+  - r_f_joint1_3
+  - r_f_joint1_4
+  - r_f_joint2_1
+  - r_f_joint2_2
+  - r_f_joint2_3
+  - r_f_joint2_4
+  - r_f_joint3_1
+  - r_f_joint3_2
+  - r_f_joint3_3
+  - r_f_joint3_4
+  - r_f_joint4_1
+  - r_f_joint4_2
+  - r_f_joint4_3
+  - r_f_joint4_4
+  - r_f_joint5_1
+  - r_f_joint5_2
+  - r_f_joint5_3
+  - r_f_joint5_4
+
+cameras:
+  table_camera:
+    type: opencv
+    index_or_path: 0
+    width: 640
+    height: 480
+    fps: 30
+  wrist_overhead_camera:
+    type: opencv
+    index_or_path: 0
+    width: 640
+    height: 480
+    fps: 30
+
+physics_dt: 0.001
+control_fps: 30
+show_viewer: true
+show_camera_panel: true
+randomize_screwdrivers: false

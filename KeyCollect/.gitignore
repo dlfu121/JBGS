@@ -1,0 +1,69 @@
+# OS
+
+.DS_Store
+Thumbs.db
+
+# IDE
+
+.vscode/
+.idea/
+*.swp
+
+# Logs
+
+*.log
+MUJOCO_LOG.TXT
+logs/
+
+# Env
+
+.env
+.env.*
+
+# Python
+
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv-*/
+venv/
+.matplotlib-cache/
+assets/scenes/current_state.npz
+dist/
+build/
+*.egg-info/
+
+# Node
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test & coverage
+
+.coverage
+.pytest_cache/
+coverage/
+htmlcov/
+
+# Misc
+
+tmp/
+temp/
+*.tmp
+*:Zone.Identifier
+# data
+/data
+
+# Local model and training artifacts (too large for regular GitHub Git storage)
+/model/
+/outputs/
+
+# Generated local backups and accidentally materialized CLI argument files
+*.bak
+/--checkpoint
+/--dataset-root
+/--random-seed

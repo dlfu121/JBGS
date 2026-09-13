@@ -1,0 +1,18 @@
+<!-- Camera mounts copied from assets/scenes/rm65_dexhand_scene.xml.
+     table_camera is world-fixed; wrist_overhead_camera is a link_6 child. -->
+<worldbody>
+  <camera
+    name="table_camera"
+    pos="-0.500 0.000 1.879"
+    xyaxes="0.000000 -1.000000 0.000000 0.171341 0.000000 0.985212"
+    fovy="70" />
+
+  <!-- Insert this element directly inside the target wrist body (link_6). -->
+  <body name="link_6">
+    <camera
+      name="wrist_overhead_camera"
+      pos="0.020 0.001 0.017"
+      xyaxes="-0.000000 -0.999977 -0.006718 -0.916905 -0.002681 0.399096"
+      fovy="100" />
+  </body>
+</worldbody>

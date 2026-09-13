@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "name": "rm65_dexhand_camera_arm_mount",
+  "source_scene": "assets/scenes/rm65_dexhand_scene.xml",
+  "units": {"position": "m", "angle": "rad", "fovy": "deg"},
+  "frames": {
+    "world": {"description": "MuJoCo world frame"},
+    "arm_base": {
+      "mujoco_name": "link_1",
+      "parent": "world",
+      "pose_in_parent": {
+        "pos": [-0.7, 0.0, 1.91958],
+        "quat_wxyz": [1.0, 0.0, 0.0, 0.0]
+      }
+    },
+    "wrist": {
+      "mujoco_name": "link_6",
+      "parent": "arm_chain",
+      "description": "Moving wrist/end-effector body frame"
+    }
+  },
+  "cameras": {
+    "table_camera": {
+      "role": "fixed_global_task_view",
+      "parent_frame": "world",
+      "attachment": "fixed",
+      "resolution": [640, 480],
+      "fps": 24,
+      "pose_in_parent": {
+        "pos": [-0.5, 0.0, 1.879],
+        "xyaxes": [0.0, -1.0, 0.0, 0.171341, 0.0, 0.985212],
+        "fovy_deg": 70.0
+      },
+      "relative_to_arm_base": {
+        "translation": [0.2, 0.0, -0.04058],
+        "rotation": "identity"
+      },
+      "approximate_intrinsics_px": {
+        "fx": 342.765,
+        "fy": 342.765,
+        "cx": 320.0,
+        "cy": 240.0
+      }
+    },
+    "wrist_overhead_camera": {
+      "role": "moving_near_field_hand_view",
+      "parent_frame": "wrist",
+      "attachment": "child_of_link_6",
+      "resolution": [640, 480],
+      "fps": 24,
+      "pose_in_parent": {
+        "pos": [0.02, 0.001, 0.017],
+        "xyaxes": [-0.0, -0.999977, -0.006718, -0.916905, -0.002681, 0.399096],
+        "fovy_deg": 100.0
+      },
+      "approximate_intrinsics_px": {
+        "fx": 201.434,
+        "fy": 201.434,
+        "cx": 320.0,
+        "cy": 240.0
+      }
+    }
+  },
+  "robot_interface": {
+    "arm_joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"],
+    "gripper_joint_count": 20,
+    "state_dim": 39,
+    "action_dim": 26,
+    "action_layout": [[0, 6, "ee_delta_xyz_rpy"], [6, 26, "dexhand_joint_deltas_in_config_order"]],
+    "control_fps": 24
+  }
+}

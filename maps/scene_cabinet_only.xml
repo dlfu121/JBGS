@@ -1,0 +1,64 @@
+<mujoco model="cabinet_scene">
+  <option timestep="0.004" integrator="implicitfast"/>
+  <compiler angle="radian"/>
+
+  <visual>
+    <global offwidth="1920" offheight="1080" elevation="-22" azimuth="135"/>
+    <rgba haze="0.14 0.16 0.20 1"/>
+    <map force="0.1" zfar="40"/>
+    <quality shadowsize="4096"/>
+  </visual>
+
+  <statistic center="0 0 0.95" extent="2.5"/>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1=".25 .3 .38" rgb2="0 0 0" width="32" height="512"/>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512"
+             rgb1=".18 .20 .24" rgb2=".24 .27 .32"/>
+    <material name="grid" texture="grid" texrepeat="8 8" texuniform="true" reflectance=".15"/>
+    <material name="shelf" rgba="0.80 0.82 0.85 1" reflectance="0.1"/>
+    <material name="metal" rgba="0.55 0.57 0.60 1" reflectance="0.35"/>
+  </asset>
+
+  <default>
+    <geom condim="3" friction="0.9 0.05 0.005" solref="0.008 1"/>
+  </default>
+
+  <worldbody>
+    <geom name="floor" type="plane" size="0 0 0.05" material="grid" condim="3"/>
+    <light name="top1" pos="0 0 3.5" dir="0 0 -1" diffuse="0.6 0.6 0.6"/>
+    <light name="side" pos="0 -2.5 2.2" dir="0 1 -1" diffuse="0.4 0.4 0.4"/>
+    <camera name="overview" pos="0 -2.8 1.3" xyaxes="1 0 0 0 0.42 0.91"/>
+    <camera name="top" pos="0 0 3.5" xyaxes="1 0 0 0 1 0"/>
+
+    <!-- ================= 柜子（双开门（铰链可开闭） + 三层挡板） ================= -->
+    <!-- 柜宽 1.6(半0.8) 深 0.6(半0.3) 高 1.9；置于原点，正面朝 +y -->
+    <body name="cabinet" pos="0 0 0" euler="0 0 0">
+      <!-- 柜体外壳 -->
+      <geom type="box" pos="0 0 0.03"   size="0.8 0.3 0.03" material="shelf"/>  <!-- 底板 -->
+      <geom type="box" pos="0 0 1.87"   size="0.8 0.3 0.03" material="shelf"/>  <!-- 顶板 -->
+      <geom type="box" pos="0 -0.29 0.95" size="0.8 0.02 0.95" material="shelf"/> <!-- 背板 -->
+      <geom type="box" pos="0.79 0 0.95"  size="0.02 0.3 0.95" material="shelf"/> <!-- 右侧板 -->
+      <geom type="box" pos="-0.79 0 0.95" size="0.02 0.3 0.95" material="shelf"/> <!-- 左侧板 -->
+      <!-- 三层内部挡板 -->
+      <geom type="box" pos="0 -0.02 0.50" size="0.78 0.28 0.02" material="shelf"/>
+      <geom type="box" pos="0 -0.02 0.95" size="0.78 0.28 0.02" material="shelf"/>
+      <geom type="box" pos="0 -0.02 1.40" size="0.78 0.28 0.02" material="shelf"/>
+      <!-- 双开柜门（绕竖直 z 轴铰链开闭，qpos=0 为关闭；初始打开 90°，朝 +y 打开） -->
+      <!-- 左门：铰链位于 x=-0.79（贴左侧板前缘），门扇沿 +y 打开；ref=1.57 表示初始开 90° -->
+      <body name="cabinet_door_l" pos="-0.79 0.30 0.95">
+        <joint name="cabinet_door_l_j" type="hinge" axis="0 0 1"
+               range="0 1.65" ref="1.57" damping="0.3" frictionloss="0.05"/>
+        <geom name="cabinet_door_l_panel" type="box" pos="0 0.38 0" euler="0 0 1.57"
+              size="0.38 0.015 0.9" material="metal" mass="2"/>
+      </body>
+      <!-- 右门：铰链位于 x=0.79（贴右侧板前缘），门扇沿 +y 打开；ref=-1.57 表示初始开 90° -->
+      <body name="cabinet_door_r" pos="0.79 0.30 0.95">
+        <joint name="cabinet_door_r_j" type="hinge" axis="0 0 1"
+               range="-1.65 0" ref="-1.57" damping="0.3" frictionloss="0.05"/>
+        <geom name="cabinet_door_r_panel" type="box" pos="0 0.38 0" euler="0 0 1.57"
+              size="0.38 0.015 0.9" material="metal" mass="2"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

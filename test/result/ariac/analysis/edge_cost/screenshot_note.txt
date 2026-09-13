@@ -1,0 +1,2 @@
+No DISPLAY/RViz session was available during this run.
+paths_comparison.png is an equivalent map-frame view of planning_map + nav_path.

@@ -1,0 +1,107 @@
+{
+  "scene": "ariac",
+  "map_anchor_world": [
+    4.0,
+    4.6
+  ],
+  "camera": "lefthand_camera",
+  "return_to_start": true,
+  "return_pose_map": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "travel_arm_pose": [
+    0.0,
+    1.2,
+    0.6,
+    0.0,
+    0.9,
+    0.0
+  ],
+  "travel_arm_settle_sec": 2.5,
+  "stops": [
+    {
+      "id": "cabinet_voltage",
+      "target": "cabinet electrical meter",
+      "gauge_world": [
+        -3.314,
+        7.833,
+        1.951
+      ],
+      "pose_map": [
+        -5.814,
+        3.233,
+        180.0
+      ],
+      "nav_offset_map": [
+        0.0,
+        0.0
+      ],
+      "standoff_m": 1.5,
+      "map_clearance_m": 1.4,
+      "left_arm_pose": [
+        -0.342788,
+        0.505199,
+        0.525461,
+        0.563886,
+        0.538166,
+        -0.464577
+      ],
+      "arm_settle_sec": 2.0,
+      "dwell_sec": 3.0
+    },
+    {
+      "id": "tank_pressure",
+      "target": "tank pressure gauge",
+      "gauge_world": [
+        -3.155,
+        -3.5,
+        1.85
+      ],
+      "pose_map": [
+        -5.655,
+        -8.1,
+        180.0
+      ],
+      "standoff_m": 1.5,
+      "map_clearance_m": 1.4,
+      "left_arm_pose": [
+        -0.186586,
+        0.278304,
+        0.814396,
+        0.155282,
+        0.512156,
+        -0.141112
+      ],
+      "arm_settle_sec": 2.0,
+      "dwell_sec": 3.0
+    },
+    {
+      "id": "hydrant_pressure",
+      "target": "hydrant pressure gauge",
+      "gauge_world": [
+        13.0,
+        -6.799,
+        3.1
+      ],
+      "pose_map": [
+        9.0,
+        -10.0,
+        -90.0
+      ],
+      "standoff_m": 1.4,
+      "map_clearance_m": 1.9,
+      "left_arm_pose": [
+        -0.088649,
+        -0.748020,
+        0.234919,
+        -0.029706,
+        1.446833,
+        -0.000422
+      ],
+      "arm_settle_sec": 3.5,
+      "dwell_sec": 3.0
+    }
+  ]
+}
