@@ -149,7 +149,7 @@ class InspectionRunner(Node):
             rclpy.spin_once(self, timeout_sec=0.1)
         self.get_logger().error(
             "机械臂、到位反馈或拍摄接口尚未接入；请确认 ARIAC bridge 已启动，"
-            "且 nav_p2p.py 已启动（推荐先运行 ./slam/run_nav_saved.sh --scene ariac --view），"
+            "且 slam/navigation/nav_p2p.py 已启动（推荐先运行 ./slam/navigation/run_nav_saved.sh --scene ariac --view），"
             "或先使用 --navigation-only")
         return False
 
@@ -173,8 +173,8 @@ class InspectionRunner(Node):
             rclpy.spin_once(self, timeout_sec=0.1)
         if self.goal_pub.get_subscription_count() == 0:
             self.get_logger().error(
-                "/nav_goal 没有订阅者：请先启动 ./slam/run_nav_saved.sh "
-                "--scene ariac（该脚本会启动 nav_p2p.py）")
+                "/nav_goal 没有订阅者：请先启动 ./slam/navigation/run_nav_saved.sh "
+                "--scene ariac（该脚本会启动 slam/navigation/nav_p2p.py）")
         if self.count_publishers("/pointcloud") == 0:
             self.get_logger().error(
                 "/pointcloud 没有发布者：bridge 未启动或使用了 --no-lidar；"
@@ -187,7 +187,7 @@ class InspectionRunner(Node):
                and time.monotonic() < discovery_deadline):
             rclpy.spin_once(self, timeout_sec=0.1)
         if self.goal_pub.get_subscription_count() == 0:
-            self.get_logger().error("/nav_goal 没有订阅者，请先启动 nav_p2p.py")
+            self.get_logger().error("/nav_goal 没有订阅者，请先启动 slam/navigation/nav_p2p.py")
             return False
 
         x, y, yaw_deg = stop["pose_map"]

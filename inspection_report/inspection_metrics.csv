@@ -1,4 +1,0 @@
-stop_id,captures,success,first_simulation_s,last_simulation_s,target
-cabinet_voltage,18,1,11.59999999999901,71.61999999997792,cabinet electrical meter
-hydrant_pressure,5,1,48.6999999999772,116.1400000001905,hydrant pressure gauge
-tank_pressure,10,1,30.22000000001395,92.22000000007628,tank pressure gauge

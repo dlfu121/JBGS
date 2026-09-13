@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv*/
+venv/
+env/
+
+# Local AI agent/tooling state and machine-specific config
+.agents/
+.codex/
+.claude/
+
+# MuJoCo runtime outputs and logs
+MUJOCO_LOG.TXT
+
+# Generated scenes (rebuild via model/robot/gen_ariac_robot.py)
+model/robot/ariac_lab_with_robot_3d_vla.xml
+
+# Generated media
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Editor/OS
+*.swp
+*~
+.DS_Store

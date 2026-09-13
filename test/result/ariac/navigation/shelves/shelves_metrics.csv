@@ -1,5 +1,0 @@
-route,min_robot_clearance_m,min_ungated_clearance_m,min_gated_clearance_m,gated_triggered
-south_to_north,0.7287962749041861,0.9543297952595857,inf,False
-north_to_south,0.7287962749041861,0.9543295445853062,inf,False
-west_to_east,0.7277009063005226,0.5474878161110119,inf,False
-east_to_west,0.7277009063005226,0.5474879472924226,inf,False

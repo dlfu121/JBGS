@@ -3,7 +3,7 @@
 
 Launches (in this order):
   1. the randomized VLA MuJoCo scene + 3D bridge (headless EGL by default);
-  2. the map->odom static TF and the saved-map navigator (nav_p2p --use-saved);
+  2. the map->odom static TF and the saved-map navigator (slam/navigation/nav_p2p.py --use-saved);
   3. the KeyCollect ACT TCP server (Python 3.12 ``keycollect`` env);
   4. the ROS ACT client in --execute mode.
 
@@ -51,11 +51,11 @@ from task_definition import (
 
 HERE = Path(__file__).resolve().parent
 WORKER_SCENE = HERE.parents[1]
-KEYCOLLECT = WORKER_SCENE / "KeyCollect"
+KEYCOLLECT = WORKER_SCENE / "datecollect_vla"
 SCENE_XML = WORKER_SCENE / "model" / "robot" / "ariac_lab_with_robot_3d.xml"
 RANDOMIZED_XML = WORKER_SCENE / "model" / "robot" / "ariac_lab_with_robot_3d_vla.xml"
 BRIDGE = WORKER_SCENE / "slam" / "bridge" / "bridge_ariac.py"
-NAV = WORKER_SCENE / "nav_p2p.py"
+NAV = WORKER_SCENE / "slam" / "navigation" / "nav_p2p.py"
 SAVED_MAP = WORKER_SCENE / "maps" / "ariac" / "ariac_map_3d.pgm"
 SAVED_MAP_YAML = WORKER_SCENE / "maps" / "ariac" / "ariac_map_3d.yaml"
 
@@ -129,7 +129,7 @@ class ActE2eRunner(Node):
 
     def _navigate(self):
         if not self._wait_subscriber():
-            self.get_logger().error("/nav_goal 无订阅者，nav_p2p 未就绪")
+            self.get_logger().error("/nav_goal 无订阅者，slam/navigation/nav_p2p.py 未就绪")
             return False
         world_x, world_y, yaw_deg = self.goal_world
         map_x = world_x - MAP_ORIGIN_WORLD[0]
@@ -231,7 +231,7 @@ def _kill_leftovers():
             continue
         if any(key in cmdline for key in (
                 "slam/bridge/bridge_ariac.py", "bridge_ariac.py",
-                "bridge_warehouse.py", "nav_p2p.py",
+                "nav_p2p.py",
                 "act_server.py", "act_bridge_client.py")):
             matched.append(int(entry))
     for pid in matched:

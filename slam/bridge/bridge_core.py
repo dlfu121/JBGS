@@ -13,9 +13,9 @@
 
 用法:
   source /opt/ros/foxy/setup.bash
-  python3.8 slam_bridge_3d.py                 # headless
-  python3.8 slam_bridge_3d.py --view          # 开 MuJoCo 查看器
-  python3.8 slam_bridge_3d.py --patrol        # 自动巡视
+  python3.8 slam/bridge/bridge_ariac.py             # headless
+  python3.8 slam/bridge/bridge_ariac.py --view      # 开 MuJoCo 查看器
+  python3.8 slam/bridge/bridge_ariac.py --patrol    # 自动巡视
 """
 import argparse
 import json
@@ -131,11 +131,11 @@ ACT_KC_JOINT1_OFFSET = math.pi
 # radius (rm65/rm65_ik.py consumers use the same value).
 ACT_RM65_SAFE_REACH_RADIUS_M = 0.5785
 
-XML_3D = os.path.join(PROJECT_ROOT, "model", "robot", "warehouse_with_robot_3d.xml")
+XML_3D = os.path.join(PROJECT_ROOT, "model", "robot", "ariac_lab_with_robot_3d.xml")
 XML_FALLBACK = os.path.join(PROJECT_ROOT, "model", "robot", "robot_template_3d_py38.xml")
-SCENE_NAME = os.environ.get("SLAM_SCENE_NAME", "warehouse")
+SCENE_NAME = os.environ.get("SLAM_SCENE_NAME", "ariac")
 TASK_PROFILE = os.environ.get(
-    "ARIAC_TASK_PROFILE", "inspect" if SCENE_NAME == "ariac" else "generic")
+    "ARIAC_TASK_PROFILE", "inspect")
 if TASK_PROFILE not in ("generic", "inspect", "vla"):
     raise ValueError("ARIAC_TASK_PROFILE must be generic, inspect, or vla")
 XML = os.environ.get("MUJOCO_SCENE_XML",
@@ -216,58 +216,6 @@ OBSTACLE_DIST = 0.75       # 雷达到障碍的水平净距阈值（米）- 紧�
 OBSTACLE_SLOW_DIST = 1.50  # 开始减速的距离
 OBSTACLE_FRONT_AZ = 42     # 前方扇区半角（单位：度，与射线数无关）
 
-# 巡视航点。除外圈外，增加三条中央扫描线，补齐仅沿墙巡视时看不到的货架区。
-#
-# 这条航线是用 clearance 检查过的：每一段的最小间隙 >= 0.99 m（狗半径约
-# 0.35 m）。旧航线有三段直接穿过实体：
-#   (4,4)->(8.5,4)   撞 shipping_container_conveyor_ariac（x 6.13..7.23,
-#                    y -3.82..4.32 的 8 米长传送带，整条挡死）
-#   (8.5,0)->(8.5,-4) 撞 warehouse_dumpster (x 7.08..9.08, y -3.10..-1.66)
-#   (4,8.5)->(4,4)    终点距 warehouse_cone_0 只有 0.32 m，小于紧急避障阈值
-# 传送带东侧到东墙之间是唯一通道，dumpster 又占了 x<9.08，所以南北向必须
-# 走 x=10.2 这条窄廊（间隙 1.12 m）。
-WAREHOUSE_PATROL_WAYPOINTS = [
-    # 西侧和北侧外圈
-    (-8.5, -8.5),   # 起点：西南角
-    (-8.5, -4.0),
-    (-8.5, 0.0),
-    (-8.5, 4.0),
-    (-8.5, 8.5),    # 西北角
-    (-4.0, 8.5),
-    (0.0, 8.5),
-    (4.0, 8.5),
-
-    # 北部扫描线：位于两排横向货架之间
-    (5.5, 5.5),     # 传送带北端(y=4.32)外侧
-    (2.2, 5.0),
-    (-3.5, 5.0),
-    (-7.5, 5.0),
-
-    # 绕货架西端进入中央中部扫描线
-    (-8.2, 4.0),
-    (-8.2, 1.8),
-    (-7.5, 1.8),
-    (-3.5, 1.8),
-    (1.0, 1.8),
-
-    # 经开阔竖向通道进入中央南部扫描线
-    (1.0, -3.0),
-    (-3.5, -3.0),
-    (-7.5, -3.0),
-
-    # 南侧外圈：西 -> 东
-    (-8.5, -4.0),
-    (-8.5, -8.5),
-    (-4.0, -8.5),
-    (0.0, -8.5),
-    (4.0, -8.5),
-    (8.5, -8.5),
-
-    # 东侧窄廊：南 -> 北（夹在传送带/dumpster 与东墙之间）
-    (10.2, -4.5),
-    (10.2, 0.0),
-    (10.2, 5.5),
-]
 # 巡视航点（ARIAC 场景，2026-08 新场景：实验室实际只有北墙 y=20.9 和东墙
 # x=23.5(y 0.4~17)，西/南开放）。
 #
@@ -318,10 +266,8 @@ ARIAC_PATROL_WAYPOINTS = [
     (10.5, 4.6),     # 34 下行回中部
     (4.0, 4.6),      # 35 回起点，闭环
 ]
-PATROL_WAYPOINTS = (ARIAC_PATROL_WAYPOINTS if SCENE_NAME == "ariac"
-                    else WAREHOUSE_PATROL_WAYPOINTS)
-PATROL_V = (0.70 if SCENE_NAME == "ariac" else 0.50)
-# ARIAC 在 10Hz 扫描下每帧约移动 7cm；warehouse 保持原来的 5cm。
+PATROL_WAYPOINTS = ARIAC_PATROL_WAYPOINTS
+PATROL_V = 0.70
 PATROL_W = 0.6              # 降低角速度使转弯更平稳
 PATROL_TOL = 0.50           # 增大容差，避免反复调整
 PATROL_LOOP = False
@@ -529,10 +475,7 @@ class SlamBridge3D(Node):
                        dtype=np.int32)
             if self._act_screwdriver_body >= 0
             else np.asarray([], dtype=np.int32))
-        person_names = (("dynamic_person", "dynamic_person_2")
-                        if SCENE_NAME == "ariac" else
-                        ("dynamic_person", "dynamic_person_2",
-                         "dynamic_person_3"))
+        person_names = ("dynamic_person", "dynamic_person_2")
         self._person_mocaps = []
         for person_name in person_names:
             person_body = mujoco.mj_name2id(
@@ -1064,64 +1007,38 @@ class SlamBridge3D(Node):
         tank->hydrant long aisle, a walker that enters the dog's lane from the
         side and then stops in front of it as a stationary obstacle. They contain
         fixed bends, run at different speeds, and are traversed
-        forwards/backwards forever.  The warehouse scene has no
-        cabinet/tank/hydrant route, so it gets separate outer-aisle paths
-        instead of accidentally using ARIAC coordinates.  No random values are
+        forwards/backwards forever.  No random values are
         used; ``--seed`` cannot change these paths.
         """
-        if SCENE_NAME == "ariac":
-            # Separate encounter areas, all in the open aisle. Each person
-            # starts once the dog approaches, then runs on its own clock.
-            # No position follows the dog, even when navigation pauses.
-            lanes = (
-                {
-                    "points": ((-5.05, -5.8), (-5.05, -4.8),
-                               (-3.8, -4.8), (-3.8, -6.8)),
-                    "speed_mps": 0.22, "offset": 0.0,
-                    "curve_amp": 0.06, "curve_sign": 1.0,
-                },
-                {
-                    # Red pedestrian steps from the aisle side into the dog's
-                    # own lane and then STOPS in front of the dog.  The
-                    # tank->hydrant planner lane is the straight segment
-                    # stop2(-5.65,-8.1) -> stop3(9.0,-10.0):
-                    # y(x)=-8.1-(1.9/14.65)*(x+5.65), so at x=1.0 it sits at
-                    # y~=-8.96.  The walker waits below the lane (spawn, out of
-                    # the DWA swept band), steps north onto the lane, and
-                    # ``stop_index`` holds it there so it becomes a stationary
-                    # frontal obstacle the dog must actively avoid.  The
-                    # remaining points are never reached once the hold starts.
-                    "points": ((1.0, -9.71), (1.0, -8.96),
-                               (2.4, -9.14), (3.8, -9.33),
-                               (5.2, -9.51), (6.6, -9.69)),
-                    "speed_mps": 0.42, "offset": 0.0,
-                    "curve_amp": 0.04, "curve_sign": 1.0,
-                    "stop_index": 1,
-                },
-            )
-        else:
-            lanes = (
-                # Warehouse-only outer aisles; no inspection-route clearance
-                # or ARIAC stop coordinates are applied in this scene.
-                {
-                    "points": ((-10.6, -12.5), (-10.6, -5.0),
-                               (-9.6, -2.5), (-10.6, 2.0), (-10.6, 7.4)),
-                    "speed_mps": 0.45, "offset": 0.0,
-                    "curve_amp": 0.28, "curve_sign": 1.0,
-                },
-                {
-                    "points": ((12.0, -12.5), (11.4, -8.0),
-                               (12.0, -3.5), (11.4, 1.0), (12.0, 7.4)),
-                    "speed_mps": 0.68, "offset": 7.0,
-                    "curve_amp": 0.24, "curve_sign": -1.0,
-                },
-                {
-                    "points": ((3.0, 0.0), (4.0, 2.0), (3.0, 4.0),
-                               (4.0, 6.0), (3.0, 8.0)),
-                    "speed_mps": 0.92, "offset": 13.0,
-                    "curve_amp": 0.20, "curve_sign": 1.0,
-                },
-            )
+        # Separate encounter areas, all in the open aisle. Each person
+        # starts once the dog approaches, then runs on its own clock.
+        # No position follows the dog, even when navigation pauses.
+        lanes = (
+            {
+                "points": ((-5.05, -5.8), (-5.05, -4.8),
+                           (-3.8, -4.8), (-3.8, -6.8)),
+                "speed_mps": 0.22, "offset": 0.0,
+                "curve_amp": 0.06, "curve_sign": 1.0,
+            },
+            {
+                # Red pedestrian steps from the aisle side into the dog's
+                # own lane and then STOPS in front of the dog.  The
+                # tank->hydrant planner lane is the straight segment
+                # stop2(-5.65,-8.1) -> stop3(9.0,-10.0):
+                # y(x)=-8.1-(1.9/14.65)*(x+5.65), so at x=1.0 it sits at
+                # y~=-8.96.  The walker waits below the lane (spawn, out of
+                # the DWA swept band), steps north onto the lane, and
+                # ``stop_index`` holds it there so it becomes a stationary
+                # frontal obstacle the dog must actively avoid.  The
+                # remaining points are never reached once the hold starts.
+                "points": ((1.0, -9.71), (1.0, -8.96),
+                           (2.4, -9.14), (3.8, -9.33),
+                           (5.2, -9.51), (6.6, -9.69)),
+                "speed_mps": 0.42, "offset": 0.0,
+                "curve_amp": 0.04, "curve_sign": 1.0,
+                "stop_index": 1,
+            },
+        )
         tracks = []
         for lane in lanes:
             points = np.asarray(lane["points"], dtype=np.float64)
@@ -1211,9 +1128,8 @@ class SlamBridge3D(Node):
             # In the ARIAC inspection the pedestrian owns its trajectory and
             # never yields to the dog.  A zero robot gap disables only that
             # yield rule; lidar/DWA remains responsible for collision
-            # avoidance. Warehouse traffic retains the conservative behavior.
-            robot_gap = (0.0 if SCENE_NAME == "ariac" else
-                         PERSON_ROBOT_HARD_CLEARANCE)
+            # avoidance.
+            robot_gap = 0.0
             self._person_traffic = PedestrianTraffic(
                 starts, robot_gap=robot_gap)
             self._person_motion_time = now
@@ -1222,7 +1138,7 @@ class SlamBridge3D(Node):
             lambda index, elapsed: self._person_position(
                 self._person_tracks[index], elapsed),
             robot=robot_map,
-            trigger_distance=3.2 if SCENE_NAME == "ariac" else None)
+            trigger_distance=3.2)
         self._person_motion_time = now
         for mocap_id, position in zip(self._person_mocaps, positions):
             self.data.mocap_pos[mocap_id] = (
@@ -1693,7 +1609,8 @@ class SlamBridge3D(Node):
         def _save():
             # RTAB-Map 以 1 Hz 消费点云；先让最后一帧及回调队列处理完。
             time.sleep(1.5)
-            script = os.path.join(PROJECT_ROOT, "slam", "save_map_3d.sh")
+            script = os.path.join(PROJECT_ROOT, "slam", "mapping",
+                                  "save_map_3d.sh")
             if os.path.isfile(script):
                 result = subprocess.run(
                     ["bash", script, "--scene", SCENE_NAME, "--finalize"],
@@ -1908,7 +1825,7 @@ def main():
     ap.add_argument("--odom-noise", action="store_true",
                     help="注入里程计随机游走（仅用于回环/漂移压力测试）")
     ap.add_argument("--dynamic-person", action="store_true",
-                    help="启用固定轨迹测试行人（ARIAC 2 个，warehouse 3 个）")
+                    help="启用固定轨迹测试行人（ARIAC 2 个）")
     ap.add_argument("--sim-speed", type=float, default=1.0, metavar="FACTOR",
                     help="仿真时间相对墙钟时间的倍率（推荐 1.0~2.0）")
     ap.add_argument("--inspection-fps", type=float,

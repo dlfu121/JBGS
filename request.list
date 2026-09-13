@@ -1,0 +1,50 @@
+# request.list —— worker_scene 项目需求清单
+#
+# 本清单与 README「运行环境」一节对应。仓库内所有模块统一运行于
+# Ubuntu 20.04 + Python 3.8 + MuJoCo 3.2.3 + ROS 2 Foxy。
+# 详细安装与使用见各模块 README。
+
+## 1. 系统与基础环境
+- Ubuntu 20.04
+- Python 3.8
+- MuJoCo 3.2.3
+- ROS 2 Foxy（rclpy 仅提供 cpython-38 扩展）
+
+## 2. ROS 包
+- ros-foxy-rtabmap-ros        # 3D SLAM（若 apt 无此包需源码编译）
+
+## 3. Python 包（SLAM / 导航侧）
+- numpy
+- scipy
+# 安装：pip3.8 install scipy numpy
+
+## 4. VLA 与数据采集（datecollect_vla 入口，见 datecollect_vla/README.md）
+# 该入口承担动捕遥操作、LeRobot 数据采集与 ACT 训练/推理：
+- mujoco
+- lerobot == 0.6.1（含 dataset / viz / training extras）
+- matplotlib
+- pynput
+- ./datecollect_vla/lerobot_robot_mujoco                     # 本地插件，editable 安装
+- ./datecollect_vla/lerobot_teleoperator_mocap_ros[rosbridge]  # 本地插件，editable 安装
+# 系统库：
+- libgl1-mesa-dev
+- libglfw3、libglfw3-dev
+# 动捕遥操作链路（数据采集时使用，ROS1）：
+- ROS1 Noetic
+- rosbridge_server（rosbridge_websocket，监听 9090 端口）
+- 动捕 Catkin 工作空间：$HOME/dongziyue/mocap_joint_publisher
+  （ROS 包 mocapapi，节点 mocap_joint_publisher）
+
+## 5. 关键项目文件（运行最终任务必需）
+# 模型与场景
+- model/scenes/ariac_lab.xml                       # ARIAC 主场景
+- model/robot/ariac_lab_with_robot_3d.xml          # SLAM 组合模型（由 gen_ariac_robot.py 生成）
+# SLAM 地图与参数
+- maps/ariac/ariac_map_3d.yaml + ariac_map_3d.pgm  # 已保存 2D 栅格地图
+- slam/mapping/rtabmap_params.yaml                 # rtabmap ICP-SLAM 参数
+# 最终任务
+- _ultimate_task/vla/task_definition.py            # VLA 桌前目标、相机外参、ACT/IK 定义
+- _ultimate_task/inspect/inspection_route.json     # 巡检路线与每点拍摄姿态
+# VLA 控制来源（datecollect_vla）
+- datecollect_vla/outputs/train/act_rm65_dexhand   # ACT checkpoint
+- datecollect_vla/data/rm65_dexhand_merged         # 训练/验证数据集

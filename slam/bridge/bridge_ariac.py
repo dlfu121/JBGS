@@ -1,9 +1,8 @@
 #!/usr/bin/env python3.8
 """ARIAC-scene entry point for the shared 3-D MuJoCo/ROS bridge.
 
-This is a separate entry point from ``bridge_warehouse.py``.  Both use the
-same low-level bridge implementation, but this file binds the ARIAC scene
-before importing it, so ARIAC never runs a warehouse entry-point script.
+This file binds the ARIAC scene before importing the shared low-level bridge
+implementation in ``bridge_core.py``.
 """
 
 import os

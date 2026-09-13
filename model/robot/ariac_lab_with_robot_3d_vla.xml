@@ -5,7 +5,7 @@
   <visual>
     <global offwidth="2560" offheight="1440" azimuth="135" elevation="-28" />
     <quality shadowsize="4096" offsamples="8" />
-    <!-- MuJoCo's near clip plane is znear * stat.extent.  This warehouse scene
+    <!-- MuJoCo's near clip plane is znear * stat.extent.  This scene
          is ~86 m across, so the default znear=0.01 yields a ~0.86 m near plane
          that clips the table from the ACT cameras.  znear=0.00037 gives a
          ~0.032 m near plane, matching KeyCollect's extent=3.2, znear=0.01 so
@@ -683,7 +683,7 @@
     </body>
     <!-- ================= 柜子（双开门（铰链可开闭） + 三层挡板） ================= -->
     <!-- 柜宽 1.6(半0.8) 深 0.6(半0.3) 高 1.9；置于原点，正面朝 +y -->
-    <!-- Cabinet is positioned at the rear/right side of the warehouse, as in
+    <!-- Cabinet is positioned at the rear/right side of the hall, as in
          the reference view, while keeping the source model's local offset. -->
     <body name="cabinet" pos="-4.468 9 0" euler="0 0 1.570796327">
       <body name="cabinet_imported_model" pos="-2.334285714 1.118285714 0.010857142">
@@ -906,7 +906,7 @@
             rgba=".2 .5 .9 0" friction=".8 .02 .002" />
     </body>
     <!-- Optional dynamic pedestrians. They remain outside the scene until
-         bridge_warehouse receives its dynamic-person option or inspection toggle. -->
+         bridge_ariac receives its dynamic-person option or inspection toggle. -->
     <body name="dynamic_person" mocap="true" pos="-20 -20 0">
       <geom name="dynamic_person_torso" type="capsule"
             fromto="0 0 0.72 0 0 1.48" size="0.20"

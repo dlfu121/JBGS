@@ -2,7 +2,7 @@
 """Launch the ARIAC VLA scene and navigate the robot to the table.
 
 This is the VLA goal-publishing step used after
-``./slam/run_nav_saved.sh --scene ariac --view``.  The shared launcher owns
+``./slam/navigation/run_nav_saved.sh --scene ariac --view``.  The shared launcher owns
 MuJoCo, the saved map, the map->odom TF, and navigation; this script only
 publishes the calculated table-approach goal.
 """
@@ -38,7 +38,7 @@ WORKER_SCENE = HERE.parents[1]
 SCENE_XML = WORKER_SCENE / "model" / "robot" / "ariac_lab_with_robot_3d.xml"
 RANDOMIZED_XML = WORKER_SCENE / "model" / "robot" / "ariac_lab_with_robot_3d_vla.xml"
 BRIDGE = WORKER_SCENE / "slam" / "bridge" / "bridge_ariac.py"
-NAV = WORKER_SCENE / "nav_p2p.py"
+NAV = WORKER_SCENE / "slam" / "navigation" / "nav_p2p.py"
 SAVED_MAP = WORKER_SCENE / "maps" / "ariac" / "ariac_map_3d.pgm"
 SAVED_MAP_YAML = WORKER_SCENE / "maps" / "ariac" / "ariac_map_3d.yaml"
 ACTIVE_STATES = {"PLANNING", "FOLLOWING", "DYNAMIC_AVOID", "ALIGNING"}
@@ -148,7 +148,7 @@ class TableApproachRunner(Node):
                and time.monotonic() < discovery_deadline):
             rclpy.spin_once(self, timeout_sec=0.1)
         if self.goal_pub.get_subscription_count() == 0:
-            self.get_logger().error("/nav_goal 没有订阅者，请确认 nav_p2p.py 已启动")
+            self.get_logger().error("/nav_goal 没有订阅者，请确认 slam/navigation/nav_p2p.py 已启动")
             return False
 
         world_x, world_y, yaw_deg = goal_world
@@ -219,7 +219,7 @@ def _start_processes(args, randomized_xml):
             raise RuntimeError("ARIAC MuJoCo bridge 启动失败")
 
         # nav_p2p uses map coordinates while bridge publishes odom.  The
-        # saved-map launch path (slam/run_nav_saved.sh) installs this same
+        # saved-map launch path (slam/navigation/run_nav_saved.sh) installs this same
         # identity transform; without it the navigator cannot obtain a pose
         # in the saved map and reports NO_POSE/NO_MAP.
         static_tf = subprocess.Popen(
